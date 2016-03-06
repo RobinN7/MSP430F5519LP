@@ -5,10 +5,9 @@
  */
 
 volatile unsigned int US_TimeCounter = 0;
-volatile unsigned int US_MesuredTime = 0;
-volatile unsigned int US_MesuredDist = 0;
+volatile unsigned int US_Mes = 0;
 
-char US_MesuredDist_str[10] = "";
+char US_Mes_str[10] = "";
 
 
 int main(void) {
@@ -37,30 +36,32 @@ int main(void) {
         
         US_UpdateValue();
         
-        __delay_cycles(200000);  
         
-        
-        strcpyint(US_MesuredDist_str,US_MesuredTime);
+        strcpyint(US_Mes_str,US_Mes);
 
         LCD_Goto(1, 10);            
         LCD_WriteString("     ");    
         LCD_Goto(1, 10);
-        LCD_WriteString(US_MesuredDist_str); 
+        LCD_WriteString(US_Mes_str); 
         LCD_WriteString("cm"); 
+        
+        __delay_cycles(10000);  
+        
     }
     
 	return 0;
 }
 
 
-void strcpyint(char *str, int nb){
+void strcpyint(char *str, int nb){          // Copy nb at *str under decimal format
+                                            // This implementation works if nb<1000
     int divider=1000;
     for (divider=1000; divider!=0; divider/=10){
         switch((nb/divider)%10){
-            case 0:
-                if ( ((nb/1000) && (divider<1000)) 
-                            | ((nb/100) && (divider<100)) 
-                                    | ((nb/10) && (divider<10)) )
+            case 0:                         
+                if (((nb/1000) && (divider<1000))   // Do not write zeros on the left
+                |((nb/100) && (divider<100)) 
+                |(divider<10))
                     *str++='0'; 
                 break;
             case 1:
@@ -101,7 +102,7 @@ __interrupt void TIMER0_A0_ISR(void){
     if (P2IN & US_TRIGECHO)
         US_TimeCounter++;
     else{
-        US_MesuredTime = US_TimeCounter;
+        US_Mes = US_TimeCounter;
     }
     TA0IV=0;                                // clear flag 
 }

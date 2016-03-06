@@ -38,7 +38,7 @@ void LCD_SendData(byte data){
                  + (LCD_DATAPORT & BIT0);
     LCD_RSENPORT |= LCD_EN;                     // SET EN
     LCD_RSENPORT &= ~LCD_EN;                    // CLR EN
-    __delay_cycles(5000); 
+    __delay_cycles(500); 
 }
 
 void LCD_WriteConf(byte data){
@@ -53,9 +53,9 @@ void LCD_WriteChar(byte data){
 
 void LCD_WriteString(byte *data){
     while(*data){
-        if (*data=='\n'){   
+        if (*data=='\n'){                       // Go to second line if \n
             LCD_WriteConf(0xC0);
-            data++;
+            *data++;
         }
         else
             LCD_WriteChar(*data++);  
